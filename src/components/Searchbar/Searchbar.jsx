@@ -1,4 +1,6 @@
 import React, { Component } from 'react';
+import css from './Searchbar.module.css';
+import { CiSearch } from 'react-icons/ci';
 class Searchbar extends Component {
   state = {
     query: '',
@@ -25,14 +27,15 @@ class Searchbar extends Component {
 
   render() {
     return (
-      <header className="searchbar">
-        <form className="form" onSubmit={this.onSubmit}>
-          <button type="submit" className="button">
-            <span className="button-label">Search</span>
+      <header className={css.Searchbar}>
+        <form className={css.SearchForm} onSubmit={this.onSubmit}>
+          <button type="submit" className={css.SearchFormButton}>
+            {' '}
+            <CiSearch className={css.icon} />
           </button>
 
           <input
-            className="input"
+            className={css.SearchFormInput}
             type="text"
             autoComplete="off"
             autoFocus
