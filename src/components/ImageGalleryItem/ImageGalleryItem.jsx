@@ -1,7 +1,8 @@
-const ImageGalleryItem = ({ url }) => {
+import css from './ImageGalleryItem.module.css';
+const ImageGalleryItem = ({ url, alt }) => {
   return (
-    <li className="gallery-item">
-      <img src={url} alt="" />
+    <li className={css.ImageGalleryItem}>
+      <img src={url} alt={alt} className={css.ImageGalleryItemImage} />
     </li>
   );
 };

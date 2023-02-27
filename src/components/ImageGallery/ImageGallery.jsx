@@ -1,13 +1,17 @@
 import { Component } from 'react';
 import ImageGalleryItem from 'components/ImageGalleryItem';
+import css from './ImageGallery.module.css';
+// import Button from 'components/Button';
 const data = {
   BASE_URL: 'https://pixabay.com/api/',
   API_KEY: '33190219-0860edc2b5cf578f738ea4f26',
 };
 
+const page = 1;
+
 class ImageGallery extends Component {
   state = {
-    articles: null,
+    hits: null,
     loading: false,
     error: null,
   };
@@ -17,7 +21,7 @@ class ImageGallery extends Component {
 
       this.setState({ loading: true });
       fetch(
-        `${data.BASE_URL}?key=${data.API_KEY}&q=${this.props.query}&image_type=photo&orientation=horizontal&safesearch=true&page=1&per_page=12`
+        `${data.BASE_URL}?key=${data.API_KEY}&q=${this.props.query}&image_type=photo&orientation=horizontal&safesearch=true&page=${page}&per_page=12`
       )
         .then(res => {
           if (res.ok) {
@@ -28,22 +32,28 @@ class ImageGallery extends Component {
             new Error(`По запросу ${this.props.query} ничего не найдено :(`)
           );
         })
-        .then(data => this.setState({ articles: data.hits }))
+        .then(data => {
+          console.log(data);
+          return this.setState({ hits: data.hits });
+        })
         .catch(error => this.setState({ error }))
         .finally(() => this.setState({ loading: false }));
     }
   }
   render() {
-    const { error, articles } = this.state;
+    const { error, hits } = this.state;
     return (
       <>
-        {articles && (
-          <ul>
-            {articles.map(({ id, webformatURL }) => {
-              return <ImageGalleryItem key={id} url={webformatURL} />;
+        {hits && (
+          <ul className={css.ImageGallery}>
+            {hits.map(({ id, webformatURL, tags }) => {
+              return (
+                <ImageGalleryItem key={id} url={webformatURL} alt={tags} />
+              );
             })}
           </ul>
         )}
+
         {error && <h1>{error.message}</h1>}
       </>
     );
