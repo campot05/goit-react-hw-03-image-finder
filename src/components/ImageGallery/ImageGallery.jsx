@@ -1,7 +1,7 @@
 import { Component } from 'react';
 import ImageGalleryItem from 'components/ImageGalleryItem';
 import css from './ImageGallery.module.css';
-// import Button from 'components/Button';
+import Button from 'components/Button';
 const data = {
   BASE_URL: 'https://pixabay.com/api/',
   API_KEY: '33190219-0860edc2b5cf578f738ea4f26',
@@ -14,6 +14,7 @@ class ImageGallery extends Component {
     hits: null,
     loading: false,
     error: null,
+    totalHits: 0,
   };
   componentDidUpdate(prevProps, prevState) {
     if (prevProps.query !== this.props.query) {
@@ -33,15 +34,19 @@ class ImageGallery extends Component {
           );
         })
         .then(data => {
-          console.log(data);
-          return this.setState({ hits: data.hits });
+          return this.setState({ hits: data.hits, totalHits: data.totalHits });
         })
         .catch(error => this.setState({ error }))
         .finally(() => this.setState({ loading: false }));
     }
   }
+
+  clickLoadMore = () => {
+    console.log('click');
+  };
+
   render() {
-    const { error, hits } = this.state;
+    const { error, hits, totalHits } = this.state;
     return (
       <>
         {hits && (
@@ -53,6 +58,7 @@ class ImageGallery extends Component {
             })}
           </ul>
         )}
+        {totalHits > 12 && <Button clickLoadMore={this.clickLoadMore} />}
 
         {error && <h1>{error.message}</h1>}
       </>
