@@ -7,22 +7,20 @@ const data = {
   API_KEY: '33190219-0860edc2b5cf578f738ea4f26',
 };
 
-const page = 1;
-
 class ImageGallery extends Component {
   state = {
     hits: null,
     loading: false,
     error: null,
-    totalHits: 0,
   };
+  total = 1;
+  page = 1;
   componentDidUpdate(prevProps, prevState) {
     if (prevProps.query !== this.props.query) {
-      console.log('query change');
-
       this.setState({ loading: true });
+      this.page = 1;
       fetch(
-        `${data.BASE_URL}?key=${data.API_KEY}&q=${this.props.query}&image_type=photo&orientation=horizontal&safesearch=true&page=${page}&per_page=12`
+        `${data.BASE_URL}?key=${data.API_KEY}&q=${this.props.query}&image_type=photo&orientation=horizontal&safesearch=true&page=${this.page}&per_page=12`
       )
         .then(res => {
           if (res.ok) {
@@ -34,7 +32,8 @@ class ImageGallery extends Component {
           );
         })
         .then(data => {
-          return this.setState({ hits: data.hits, totalHits: data.totalHits });
+          this.total = data.totalHits;
+          return this.setState({ hits: data.hits });
         })
         .catch(error => this.setState({ error }))
         .finally(() => this.setState({ loading: false }));
@@ -42,11 +41,31 @@ class ImageGallery extends Component {
   }
 
   clickLoadMore = () => {
-    console.log('click');
+    this.page += 1;
+    fetch(
+      `${data.BASE_URL}?key=${data.API_KEY}&q=${this.props.query}&image_type=photo&orientation=horizontal&safesearch=true&page=${this.page}&per_page=12`
+    )
+      .then(res => {
+        if (res.ok) {
+          return res.json();
+        }
+
+        return Promise.reject(
+          new Error(`По запросу ${this.props.query} ничего не найдено :(`)
+        );
+      })
+      .then(data => {
+        return this.setState(prev => {
+          return { hits: [...prev.hits, ...data.hits] };
+        });
+      })
+      .catch(error => this.setState({ error }))
+      .finally(() => this.setState({ loading: false }));
+    console.log(this.state.hits);
   };
 
   render() {
-    const { error, hits, totalHits } = this.state;
+    const { error, hits } = this.state;
     return (
       <>
         {hits && (
@@ -58,7 +77,9 @@ class ImageGallery extends Component {
             })}
           </ul>
         )}
-        {totalHits > 12 && <Button clickLoadMore={this.clickLoadMore} />}
+        {this.total > 12 * this.page && (
+          <Button clickLoadMore={this.clickLoadMore} />
+        )}
 
         {error && <h1>{error.message}</h1>}
       </>
