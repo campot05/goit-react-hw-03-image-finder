@@ -20,17 +20,13 @@ class ImageGallery extends Component {
       this.setState({ loading: true, hits: null, total: 0 });
       this.page = 1;
       const data = await fetchImg(this.props.query, this.page);
-      console.log(data.total);
-
       this.setState({
         loading: false,
         hits: data.hits,
         total: data.totalHits,
       });
 
-      console.log(data);
       if (data.total === 0) {
-        console.log('bla');
         return Notify.failure(`No results were found for ${this.props.query}`);
       }
     }
