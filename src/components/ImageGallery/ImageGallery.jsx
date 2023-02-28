@@ -4,17 +4,19 @@ import { MutatingDots } from 'react-loader-spinner';
 import ImageGalleryItem from 'components/ImageGalleryItem';
 import css from './ImageGallery.module.css';
 import Button from 'components/Button';
-
+import Modal from 'components/Modal';
 class ImageGallery extends Component {
   state = {
     hits: null,
     loading: false,
     total: 0,
+    showModal: false,
+    largeUrl: '',
   };
   page = 1;
   async componentDidUpdate(prevProps, prevState) {
     if (prevProps.query !== this.props.query) {
-      this.setState({ loading: true, hits: null });
+      this.setState({ loading: true, hits: null, total: 0 });
       this.page = 1;
       const data = await fetchImg(this.props.query, this.page);
       this.setState({
@@ -35,16 +37,36 @@ class ImageGallery extends Component {
     }));
   };
 
+  onShowModal = () => {
+    this.setState(({ showModal }) => ({
+      showModal: !showModal,
+    }));
+  };
+
+  onClickImg = url => {
+    this.setState({ largeUrl: url, showModal: true });
+  };
+
+  closeModal = () => {
+    this.setState({ showModal: false });
+  };
+
   render() {
-    const { hits, total, loading } = this.state;
+    const { hits, total, loading, showModal, largeUrl } = this.state;
     return (
       <>
         {loading && <MutatingDots wrapperClass={css.spinner} />}
         {hits && (
           <ul className={css.ImageGallery}>
-            {hits.map(({ id, webformatURL, tags }) => {
+            {hits.map(({ id, webformatURL, tags, largeImageURL }) => {
               return (
-                <ImageGalleryItem key={id} url={webformatURL} alt={tags} />
+                <ImageGalleryItem
+                  key={id}
+                  url={webformatURL}
+                  alt={tags}
+                  onClick={this.onClickImg}
+                  largeImageURL={largeImageURL}
+                />
               );
             })}
           </ul>
@@ -53,6 +75,11 @@ class ImageGallery extends Component {
           <Button clickLoadMore={this.clickLoadMore}>
             {loading ? 'Loading...' : 'Load more'}
           </Button>
+        )}
+        {showModal && (
+          <Modal closeModal={this.closeModal}>
+            <img src={largeUrl} alt="items" className={css.ModalImg} />
+          </Modal>
         )}
       </>
     );
