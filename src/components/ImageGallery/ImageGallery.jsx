@@ -1,4 +1,5 @@
 import { Component } from 'react';
+import cn from 'classnames';
 import { Notify } from 'notiflix';
 import { fetchImg } from 'components/services/api';
 import { MutatingDots } from 'react-loader-spinner';
@@ -6,7 +7,8 @@ import ImageGalleryItem from 'components/ImageGalleryItem';
 import css from './ImageGallery.module.css';
 import Button from 'components/Button';
 import Modal from 'components/Modal';
-class ImageGallery extends Component {
+
+export class ImageGallery extends Component {
   state = {
     hits: null,
     loading: false,
@@ -50,13 +52,10 @@ class ImageGallery extends Component {
 
   onClickImg = url => {
     this.setState({ largeUrl: url, showModal: true });
-    document.body.classList.add('modal-open');
-    document.getElementsByTagName('html')[0].style.overflow = 'hidden';
   };
 
   closeModal = () => {
     this.setState({ showModal: false });
-    document.getElementsByTagName('html')[0].style.overflow = '';
   };
 
   render() {
@@ -65,7 +64,11 @@ class ImageGallery extends Component {
       <>
         {loading && <MutatingDots wrapperClass={css.spinner} />}
         {hits && (
-          <ul className={css.ImageGallery}>
+          <ul
+            className={cn(css.ImageGallery, {
+              [css.ImageGalleryOverflow]: showModal,
+            })}
+          >
             {hits.map(({ id, webformatURL, tags, largeImageURL }) => {
               return (
                 <ImageGalleryItem
@@ -93,5 +96,3 @@ class ImageGallery extends Component {
     );
   }
 }
-
-export default ImageGallery;
