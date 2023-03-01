@@ -50,10 +50,13 @@ class ImageGallery extends Component {
 
   onClickImg = url => {
     this.setState({ largeUrl: url, showModal: true });
+    document.body.classList.add('modal-open');
+    document.getElementsByTagName('html')[0].style.overflow = 'hidden';
   };
 
   closeModal = () => {
     this.setState({ showModal: false });
+    document.getElementsByTagName('html')[0].style.overflow = '';
   };
 
   render() {
